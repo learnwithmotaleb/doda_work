@@ -6,8 +6,8 @@ class MessageHelper {
     Fluttertoast.showToast(
       msg: message,
       toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.TOP,
-      backgroundColor: Colors.grey,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.red,
       textColor: Colors.white,
       fontSize: 16.0,
     );
@@ -17,7 +17,7 @@ class MessageHelper {
       msg: message,
       toastLength: Toast.LENGTH_LONG,
       gravity: ToastGravity.TOP,
-      backgroundColor: Colors.red,
+      backgroundColor: Colors.grey,
       textColor: Colors.white,
       fontSize: 16.0,
     );
@@ -28,7 +28,7 @@ class MessageHelper {
       msg: message,
       toastLength: Toast.LENGTH_LONG,
       gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.green,
+      backgroundColor: Colors.deepOrangeAccent,
       textColor: Colors.white,
       fontSize: 16.0,
     );

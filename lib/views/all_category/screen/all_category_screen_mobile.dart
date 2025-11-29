@@ -7,6 +7,7 @@ class AllCategoryScreenMobile extends GetView<AllCategoryController> {
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final categoryController = Get.find<CategoryController>();
+
     return Scaffold(
       appBar: CommonAppBar(title: 'All Service Category'),
       body: Obx(() {
@@ -40,49 +41,51 @@ class AllCategoryScreenMobile extends GetView<AllCategoryController> {
           );
         }
 
-        final int itemCount = categoryController.allCategory.length > 3 ? 3 : categoryController.allCategory.length;
-
+        // Show all categories
         return GridView.builder(
-          padding: EdgeInsets.zero,
-          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
             childAspectRatio: 0.9,
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
           ),
-          itemCount: itemCount,
+          itemCount: categoryController.allCategory.length,
           itemBuilder: (context, index) {
             final category = categoryController.allCategory[index];
-            return RepaintBoundary(
-              child: GestureDetector(
-                onTap: () => Get.toNamed(Routes.categoryPreviewScreen, arguments: category.id),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    ClipOval(
-                      child: CachedNetworkImage(
-                        imageUrl: category.icon != null ? ApiEndPoints.baseUrl+(category.icon ?? "") : "https://picsum.photos/200/300?random=${index + 1}",
-                        width: screenWidth * 0.16,
-                        height: screenWidth * 0.16,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                            Container(color: Colors.grey.shade300),
-                        errorWidget: (context, url, error) =>
-                            Container(color: Colors.grey.shade300, child: const Icon(Icons.error, color: Colors.red)),
-                      ),
+            return GestureDetector(
+              onTap: () => Get.toNamed(
+                  Routes.categoryPreviewScreen,
+                  arguments: category.id // use the correct ID field
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: category.icon != null
+                          ? ApiEndPoints.baseUrl + (category.icon ?? "")
+                          : "https://picsum.photos/200/300?random=$index",
+                      width: screenWidth * 0.16,
+                      height: screenWidth * 0.16,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) =>
+                          Container(color: Colors.grey.shade300),
+                      errorWidget: (context, url, error) =>
+                          Container(color: Colors.grey.shade300,
+                              child: const Icon(Icons.error, color: Colors.red)),
                     ),
-                    const SizedBox(height: 5),
-                    TextWidget(
-                      textAlign: TextAlign.center,
-                      category.name ?? "Unnamed",
-                      maxLines: 2,
-                      fontSize: Dimensions.titleSmall * 0.8,
-                      textOverflow: TextOverflow.ellipsis,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 5),
+                  TextWidget(
+                    textAlign: TextAlign.center,
+                    category.name ?? "Unnamed",
+                    maxLines: 2,
+                    fontSize: Dimensions.titleSmall * 0.8,
+                    textOverflow: TextOverflow.ellipsis,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ],
               ),
             );
           },

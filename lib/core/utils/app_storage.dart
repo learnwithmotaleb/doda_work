@@ -27,7 +27,8 @@ class AppStorage {
     bool? isKycStatus,
     bool? isVendor
   }) async {
-    if (token != null) await _storage.write(tokenKey, token);
+    // ✅ Robust token save: remove unwanted quotes and spaces
+    if (token != null) await _storage.write(tokenKey, token.replaceAll('"', '').trim());
     if (temporaryToken != null) await _storage.write(temporaryTokenKey, temporaryToken);
     if (mobileCode != null) await _storage.write(mobileCodeKey, mobileCode);
     if (onboardSave != null) await _storage.write(onboardSaveKey, onboardSave);
@@ -39,7 +40,8 @@ class AppStorage {
     if (isVendor != null) await _storage.write(isVendorKey, isVendor);
   }
 
-  static String get token => _storage.read(tokenKey) ?? '';
+  // ✅ Robust token read: always trim to avoid extra spaces
+  static String get token => (_storage.read(tokenKey) ?? '').trim();
   static String get temporaryToken => _storage.read(temporaryTokenKey) ?? '';
   static String get mobileCode => _storage.read(mobileCodeKey) ?? '';
   static bool get isLoggedIn => _storage.read(isLoggedInKey) ?? false;
@@ -52,17 +54,21 @@ class AppStorage {
 
   static AppStorageModel get common {
     return AppStorageModel(
-      _storage.read(tokenKey) ?? '',
-      _storage.read(onboardSaveKey) ?? false,
-      _storage.read(isLoggedInKey) ?? false,
-      _storage.read(isEmailVerifiedKey) ?? false,
-      _storage.read(isKycVerifiedKey) ?? false,
-      _storage.read(isSmsVerifiedKey) ?? false,
-      _storage.read(kycStatusKey) ?? 0,
-      temporaryToken: _storage.read(temporaryTokenKey) ?? '',
-      mobileCode: _storage.read(mobileCodeKey) ?? '',
+      token,
+      onboardSave,
+      isLoggedIn,
+      isEmailVerified,
+      isKycVerified,
+      isSmsVerified,
+      isKycStatus ? 1 : 0, // keep same as before
+      temporaryToken: temporaryToken,
+      mobileCode: mobileCode,
     );
   }
+
+  static bool get seenOnboarding => _storage.read(onboardSaveKey) ?? false;
+  static set seenOnboarding(bool value) => _storage.write(onboardSaveKey, value);
+
   static Future<void> clear() async {
     await _storage.erase();
   }

@@ -17,29 +17,30 @@ class UpdateScreenMobile extends GetView<UpdateController> {
               child: Stack(
                 children: [
                   Obx(
-                    () => ClipOval(
-                      child: controller.selectedImg.value != null
-                          ? Image.file(
-                              controller.selectedImg.value!,
-                              height: 90.h,
-                              width: 100.w,
-                              fit: BoxFit.cover,
-                            )
-                          : CachedNetworkImage(
-                              imageUrl: 'https://picsum.photos/200/300?random=',
-                              height: 120,
-                              width: 120,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) =>
-                                  Container(color: Colors.grey.shade300),
-                              errorWidget: (context, error, stackTrace) => Icon(
-                                Icons.person,
-                                size: 110,
-                                color: Colors.grey,
-                              ),
-                            ),
+                        () => ClipOval(
+                      child: SizedBox(
+                        height: 120,
+                        width: 120,
+                        child: controller.selectedImg.value != null
+                            ? Image.file(
+                          controller.selectedImg.value!,
+                          fit: BoxFit.cover,
+                        )
+                            : CachedNetworkImage(
+                          imageUrl: 'https://picsum.photos/200/300?random=${DateTime.now().millisecondsSinceEpoch}',
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) =>
+                              Container(color: Colors.grey.shade300),
+                          errorWidget: (context, url, error) => Icon(
+                            Icons.person,
+                            size: 110,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
+
                   Positioned(
                     bottom: 4,
                     right: 0,

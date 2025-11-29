@@ -20,7 +20,13 @@ class ApiEndPoints {
   static const getAllBookCategory = 'book-categories/get';
   static const singlePost = 'home/book';
 
-  //category
+  //user_category
+
+  static const getAllCategory = 'category/active-categories';
+  static const getFavoritesCategory = 'category/favorites';
+  static const patchToggleToFavorites = 'category/toggle-to-favorites';
+  static const getSubCategoriesByCategory = 'category/subcategories-by-category?categoryId=68c6f418136f3599e8c394b4';
+
 
   static const categoryPreview = 'categories/books';
   static const serviceCategory = 'category/active-categories';
@@ -46,10 +52,16 @@ class ApiEndPoints {
 
   static final categoryAll = '${baseUrl}category/active-categories';
 
+
+  static String getServiceRequestAll({required int page}) {
+    return '${baseUrl}service-requests/my-requests?page=$page';
+  }
+
   static serviceCreate() => '${baseUrl}service-requests/create';
 
   static myService({required String status, required int page}) =>
       '${baseUrl}service-requests/my-requests?status=$status&page=$page&limit=20';
+
 
   static providerService({required String status, required int page}) =>
       '${baseUrl}provider/potential-requests?providerStatus=$status&page=$page&limit=20';

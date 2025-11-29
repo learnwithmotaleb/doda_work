@@ -1,5 +1,10 @@
 part of '../screen/home_screen.dart';
 
+
+
+
+
+
 class CustomStatusCardWidget extends StatelessWidget {
   final int index;
   final bool isUser;
@@ -34,6 +39,7 @@ class CustomStatusCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final url = "${ApiEndPoints.baseUrl}$image";
     final fixedUrl = url.replaceAll(r'\', '/');
+
 
     return GestureDetector(
       onTap: onTap,

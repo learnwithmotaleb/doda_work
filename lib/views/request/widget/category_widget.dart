@@ -31,6 +31,18 @@ class _MultiSelectDropDownWidgetState extends State<MultiSelectDropDownWidget> {
     _selectedValues = widget.initialValues ?? [];
   }
 
+  // also update when widget.items changes
+  @override
+  void didUpdateWidget(covariant MultiSelectDropDownWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.items != widget.items) {
+      // remove selected items not in new list
+      _selectedValues.removeWhere((e) => !widget.items.contains(e));
+      setState(() {});
+    }
+  }
+
   void _toggleValue(String value) {
     setState(() {
       if (_selectedValues.contains(value)) {
@@ -39,51 +51,57 @@ class _MultiSelectDropDownWidgetState extends State<MultiSelectDropDownWidget> {
         _selectedValues.add(value);
       }
     });
+
     widget.onChanged(_selectedValues);
   }
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
+    double width = MediaQuery.sizeOf(context).width;
 
     return Column(
-      crossAxisAlignment: crossStart,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        /// Label
-        TextWidget(
-          padding: EdgeInsetsGeometry.only(
-            bottom: Dimensions.spaceBetweenInputTitleAndBox * 0.6,
+        /// ---------- Label ----------
+        if (widget.label != null)
+          TextWidget(
+            widget.label!,
+            padding: EdgeInsets.only(
+              bottom: Dimensions.spaceBetweenInputTitleAndBox * 0.6,
+            ),
+            fontSize: Dimensions.titleSmall,
+            fontWeight: FontWeight.w500,
+            color: CustomColors.blackColor,
           ),
-          widget.label ?? "Select Category",
-          fontSize: Dimensions.titleSmall,
-          fontWeight: FontWeight.w500,
-          color: CustomColors.blackColor,
-        ),
 
-        /// Selected chips
+        /// ---------- Selected Chips ----------
         if (_selectedValues.isNotEmpty)
           Wrap(
             spacing: 6,
             runSpacing: 6,
-            children: _selectedValues
-                .map((item) => Chip(
-              label: TextWidget(item,
+            children: _selectedValues.map((item) {
+              return Chip(
+                label: TextWidget(
+                  item,
                   fontSize: Dimensions.titleSmall,
-                  color: CustomColors.blackColor),
-              backgroundColor: CustomColors.whiteColor,
-              shape: StadiumBorder(
-                side: BorderSide(color: CustomColors.primary, width: 1),
-              ),
-              deleteIcon: const Icon(Icons.close, size: 16),
-              onDeleted: () => _toggleValue(item),
-            ))
-                .toList(),
+                  color: CustomColors.blackColor,
+                ),
+                backgroundColor: CustomColors.whiteColor,
+                shape: StadiumBorder(
+                  side: BorderSide(color: CustomColors.primary, width: 1),
+                ),
+                deleteIcon: Icon(Icons.close, size: 16, color: CustomColors.primary),
+                onDeleted: () => _toggleValue(item),
+              );
+            }).toList(),
           ).marginOnly(bottom: 8),
 
-        /// Dropdown field
+        /// ---------- Dropdown Field ----------
         Container(
-          padding: Dimensions.defaultHorizontalSize.edgeHorizontal * 0.5,
-          height: Dimensions.inputBoxHeight * 0.7,
+          padding: EdgeInsets.symmetric(
+            horizontal: Dimensions.defaultHorizontalSize * 0.5,
+          ),
+          height: Dimensions.inputBoxHeight * 0.75,
           decoration: BoxDecoration(
             border: Border.all(
               color: _selectedValues.isEmpty
@@ -95,21 +113,21 @@ class _MultiSelectDropDownWidgetState extends State<MultiSelectDropDownWidget> {
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
+              value: null, // always null — multi select hack
+              isExpanded: true,
               dropdownColor: CustomColors.whiteColor,
               iconEnabledColor: _selectedValues.isEmpty
                   ? CustomColors.disableColor
                   : CustomColors.primary,
-              value: null, // always null to allow multi select
-              isExpanded: true,
               hint: TextWidget(
                 widget.hint,
                 color: Colors.grey,
                 fontSize: width * 0.04,
               ),
-              items: widget.items
-                  .map(
-                    (item) => DropdownMenuItem(
+              items: widget.items.map((item) {
+                return DropdownMenuItem(
                   value: item,
+                  enabled: true,
                   child: Row(
                     children: [
                       Checkbox(
@@ -117,14 +135,17 @@ class _MultiSelectDropDownWidgetState extends State<MultiSelectDropDownWidget> {
                         activeColor: CustomColors.primary,
                         onChanged: (_) => _toggleValue(item),
                       ),
-                      TextWidget(item,
+                      Expanded(
+                        child: TextWidget(
+                          item,
                           fontSize: Dimensions.titleSmall,
-                          color: CustomColors.blackColor),
+                          color: CustomColors.blackColor,
+                        ),
+                      ),
                     ],
                   ),
-                ),
-              )
-                  .toList(),
+                );
+              }).toList(),
               onChanged: (value) {
                 if (value != null) _toggleValue(value);
               },

@@ -16,7 +16,7 @@ class TermsController extends GetxController {
   Future<void> getTermsCondition() async {
     try{
       isLoading.value = true;
-      var response = await ApiClient.get(url: ApiEndPoints.getTerms);
+      var response = await ApiClient.get(url: ApiEndPoints.faqGet);
       if (response.statusCode == 200) {
         termsData.value = TermsModel.fromJson(response.body);
 

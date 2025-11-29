@@ -1,4 +1,5 @@
 import 'package:doda_work/core/api/model/basic_success_model.dart';
+import 'package:doda_work/core/utils/message_helper.dart';
 import '../../../routes/routes.dart';
 import '../../../views/auth/login/model/login_model.dart';
 import '../../../views/auth/register/model/provider_otp_verify_model.dart';
@@ -92,7 +93,7 @@ class AuthService {
       onSuccess: (result) {
         AppStorage.isVendor == true
             ? Get.toNamed(Routes.aditionalScreen)
-            : Get.offAllNamed(Routes.navigationScreen);
+            : Get.offAllNamed(Routes.loginScreen);
         AppStorage.save(temporaryToken: result.data.accessToken);
       },
     );
@@ -134,7 +135,11 @@ class AuthService {
       isLoading: isLoading,
       body: inputBody,
       showSuccessSnackBar: true,
-      onSuccess: (result) => Get.back(),
+      onSuccess: (result){
+        MessageHelper.showSuccess("Change Password Success");
+        Get.back();
+        Get.toNamed(Routes.loginScreen);
+      },
     );
   }
 }

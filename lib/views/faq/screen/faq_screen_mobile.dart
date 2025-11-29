@@ -8,95 +8,74 @@ class FaqScreenMobile extends GetView<FaqController> {
     return Scaffold(
       appBar: CommonAppBar(title: "FAQ"),
       body: SafeArea(
-        child: Obx(
-          () => controller.faqList.isEmpty
-              ? EmptyDataWidget()
-              : controller.isLoading.value
-              ? LoadingWidget()
-              : SingleChildScrollView(
-                  child: Padding(
-                    padding: Dimensions.defaultHorizontalSize.edgeHorizontal,
-                    child: Column(
-                      crossAxisAlignment: crossStart,
-                      children: List.generate(controller.faqList.length, (
-                        index,
-                      ) {
-                        final faq = controller.faqList[index];
-                        return Column(
-                          children: [
-                            _buildFaqItem(
-                              title: 'faq.question',
-                              content: 'faq.description',
-                              isExpanded:
-                                  controller.expandedIndex.value == index,
-                              onTap: () => controller.toggleExpand(index),
-                            ),
-                            _buildDivider(),
-                          ],
-                        );
-                      }),
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (controller.faqList.isNotEmpty) {
+            return ListView(
+              padding: Dimensions.defaultHorizontalSize.edgeHorizontal,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Frequently Asked Questions',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                   ),
                 ),
-        ),
+                ...controller.faqList.map((faq) => _buildFaqItem(faq)).toList(),
+              ],
+            );
+          }
+
+          return Center(child: Text('No FAQs available.'));
+        }),
       ),
     );
   }
 
-  Widget _buildFaqItem({
-    required String title,
-    required String content,
-    required bool isExpanded,
-    required Function onTap,
-  }) {
+  Widget _buildFaqItem(Data faq) {
     return Column(
-      crossAxisAlignment: crossStart,
       children: [
-        InkWell(
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-          onTap: () => onTap(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: TextWidget(
-                    title,
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                faq.question ?? 'No question available',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
-                Icon(
-                  isExpanded
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
-                  color: Colors.white,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                faq.description ?? 'No description available',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black87,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          height: isExpanded ? null : 0,
-          child: isExpanded
-              ? Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: Text(
-                    content,
-                    style: const TextStyle(color: Colors.white70),
-                  ),
-                )
-              : const SizedBox(),
-        ),
+        _buildDivider(),
       ],
     );
   }
 
   Widget _buildDivider() {
-    return const Divider(color: Colors.grey, height: 1);
+    return const Divider(
+      color: Colors.grey,
+      height: 1,
+      thickness: 0.5,
+    );
   }
 }

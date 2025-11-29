@@ -4,18 +4,13 @@ class HomeModel {
   final String? message;
   final Data? data;
 
-  HomeModel({
-    this.statusCode,
-    this.success,
-    this.message,
-    this.data,
-  });
+  HomeModel({this.statusCode, this.success, this.message, this.data});
 
   factory HomeModel.fromJson(Map<String, dynamic> json) => HomeModel(
     statusCode: json["statusCode"],
     success: json["success"],
     message: json["message"],
-    data: json["data"] == null ? null : Data.fromJson(json["data"]),
+    data: json["data"] != null ? Data.fromJson(json["data"]) : null,
   );
 
   Map<String, dynamic> toJson() => {
@@ -27,24 +22,23 @@ class HomeModel {
 }
 
 class Data {
-  final List<HomeServiceItem>? requests;
+  final List<HomeServiceItem> requests;
   final bool? success;
   final String? message;
 
-  Data({
-    this.requests,
-    this.success,
-    this.message,
-  });
+  Data({this.requests = const [], this.success, this.message});
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-    requests: json["requests"] == null ? [] : List<HomeServiceItem>.from(json["requests"]!.map((x) => HomeServiceItem.fromJson(x))),
+    requests: json["requests"] != null
+        ? List<HomeServiceItem>.from(
+        json["requests"].map((x) => HomeServiceItem.fromJson(x)))
+        : [],
     success: json["success"],
     message: json["message"],
   );
 
   Map<String, dynamic> toJson() => {
-    "requests": requests == null ? [] : List<dynamic>.from(requests!.map((x) => x.toJson())),
+    "requests": requests.map((x) => x.toJson()).toList(),
     "success": success,
     "message": message,
   };
@@ -65,12 +59,12 @@ class HomeServiceItem {
   final num? latitude;
   final num? longitude;
   final String? description;
-  final List<String?>? attachments;
+  final List<String> attachments;
   final String? status;
   final num? leadFee;
   final String? paymentStatus;
-  final List<dynamic>? completionProof;
-  final List<dynamic>? potentialProviders;
+  final List<dynamic> completionProof;
+  final List<dynamic> potentialProviders;
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final String? requestId;
@@ -90,12 +84,12 @@ class HomeServiceItem {
     this.latitude,
     this.longitude,
     this.description,
-    this.attachments,
+    this.attachments = const [],
     this.status,
     this.leadFee,
     this.paymentStatus,
-    this.completionProof,
-    this.potentialProviders,
+    this.completionProof = const [],
+    this.potentialProviders = const [],
     this.createdAt,
     this.updatedAt,
     this.requestId,
@@ -103,27 +97,45 @@ class HomeServiceItem {
 
   factory HomeServiceItem.fromJson(Map<String, dynamic> json) => HomeServiceItem(
     id: json["_id"],
-    customerId: json["customerId"] == null ? null : CustomerId.fromJson(json["customerId"]),
+    customerId: json["customerId"] != null
+        ? CustomerId.fromJson(json["customerId"])
+        : null,
     customerPhone: json["customerPhone"],
-    serviceCategory: json["serviceCategory"] == null ? null : ServiceCategory.fromJson(json["serviceCategory"]),
+    serviceCategory: json["serviceCategory"] != null
+        ? ServiceCategory.fromJson(json["serviceCategory"])
+        : null,
     subcategory: json["subcategory"],
     priority: json["priority"],
-    startDate: json["startDate"] == null ? null : DateTime.parse(json["startDate"]),
-    endDate: json["endDate"] == null ? null : DateTime.parse(json["endDate"]),
+    startDate: json["startDate"] != null
+        ? DateTime.parse(json["startDate"])
+        : null,
+    endDate: json["endDate"] != null
+        ? DateTime.parse(json["endDate"])
+        : null,
     startTime: json["startTime"],
     endTime: json["endTime"],
     address: json["address"],
     latitude: json["latitude"]?.toDouble(),
     longitude: json["longitude"]?.toDouble(),
     description: json["description"],
-    attachments: json["attachments"] == null ? [] : List<String?>.from(json["attachments"]!.map((x) => x)),
+    attachments: json["attachments"] != null
+        ? List<String>.from(json["attachments"])
+        : [],
     status: json["status"],
     leadFee: json["leadFee"],
     paymentStatus: json["paymentStatus"],
-    completionProof: json["completionProof"] == null ? [] : List<dynamic>.from(json["completionProof"]!.map((x) => x)),
-    potentialProviders: json["potentialProviders"] == null ? [] : List<dynamic>.from(json["potentialProviders"]!.map((x) => x)),
-    createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-    updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
+    completionProof: json["completionProof"] != null
+        ? List<dynamic>.from(json["completionProof"])
+        : [],
+    potentialProviders: json["potentialProviders"] != null
+        ? List<dynamic>.from(json["potentialProviders"])
+        : [],
+    createdAt: json["createdAt"] != null
+        ? DateTime.parse(json["createdAt"])
+        : null,
+    updatedAt: json["updatedAt"] != null
+        ? DateTime.parse(json["updatedAt"])
+        : null,
     requestId: json["requestId"],
   );
 
@@ -142,12 +154,12 @@ class HomeServiceItem {
     "latitude": latitude,
     "longitude": longitude,
     "description": description,
-    "attachments": attachments == null ? [] : List<dynamic>.from(attachments!.map((x) => x)),
+    "attachments": attachments,
     "status": status,
     "leadFee": leadFee,
     "paymentStatus": paymentStatus,
-    "completionProof": completionProof == null ? [] : List<dynamic>.from(completionProof!.map((x) => x)),
-    "potentialProviders": potentialProviders == null ? [] : List<dynamic>.from(potentialProviders!.map((x) => x)),
+    "completionProof": completionProof,
+    "potentialProviders": potentialProviders,
     "createdAt": createdAt?.toIso8601String(),
     "updatedAt": updatedAt?.toIso8601String(),
     "requestId": requestId,
@@ -160,12 +172,7 @@ class CustomerId {
   final String? email;
   final String? phoneNumber;
 
-  CustomerId({
-    this.id,
-    this.name,
-    this.email,
-    this.phoneNumber,
-  });
+  CustomerId({this.id, this.name, this.email, this.phoneNumber});
 
   factory CustomerId.fromJson(Map<String, dynamic> json) => CustomerId(
     id: json["_id"],
@@ -187,11 +194,7 @@ class ServiceCategory {
   final String? name;
   final String? icon;
 
-  ServiceCategory({
-    this.id,
-    this.name,
-    this.icon,
-  });
+  ServiceCategory({this.id, this.name, this.icon});
 
   factory ServiceCategory.fromJson(Map<String, dynamic> json) => ServiceCategory(
     id: json["_id"],

@@ -1,91 +1,100 @@
 class LoginModel {
-  final int statusCode;
   final bool success;
   final String message;
-  final Data data;
+  final LoginData data;
 
   LoginModel({
-    required this.statusCode,
     required this.success,
     required this.message,
     required this.data,
   });
 
-  factory LoginModel.fromJson(Map<String, dynamic> json) => LoginModel(
-    statusCode: json["statusCode"],
-    success: json["success"],
-    message: json["message"],
-    data: Data.fromJson(json["data"]),
-  );
+  factory LoginModel.fromJson(Map<String, dynamic> json) {
+    return LoginModel(
+      success: json['success'] ?? false,
+      message: json['message'] ?? '',
+      data: json['data'] != null
+          ? LoginData.fromJson(json['data'])
+          : LoginData.empty(),
+    );
+  }
 }
 
-class Data {
+class LoginData {
   final User user;
   final String accessToken;
-  Data({required this.user, required this.accessToken});
 
-  factory Data.fromJson(Map<String, dynamic> json) =>
-      Data(user: User.fromJson(json["user"]), accessToken: json["accessToken"]);
+  LoginData({
+    required this.user,
+    required this.accessToken,
+  });
+
+  factory LoginData.fromJson(Map<String, dynamic> json) {
+    return LoginData(
+      user: json['user'] != null ? User.fromJson(json['user']) : User.empty(),
+      accessToken: json['accessToken'] ?? '',
+    );
+  }
+
+  factory LoginData.empty() => LoginData(
+    user: User.empty(),
+    accessToken: '',
+  );
 }
 
 class User {
   final String id;
   final AuthId authId;
-  final List<dynamic> serviceCategories;
-  final bool isActive;
-  final bool isVerified;
-  final List<dynamic> attachments;
-  final int rating;
-  final int totalReviews;
-  final dynamic pendingUpdates;
-  final dynamic reservedProvider;
-  final dynamic paymentIntentId;
-  final List<dynamic> workingHours;
-  final List<dynamic> potentialProviders;
+  final String name;
+  final String email;
+  final String? profileImage;
+  final String? phoneNumber;
+  final Favorites favorites;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final int v;
 
   User({
     required this.id,
     required this.authId,
-    required this.serviceCategories,
-    required this.isActive,
-    required this.isVerified,
-    required this.attachments,
-    required this.rating,
-    required this.totalReviews,
-    required this.pendingUpdates,
-    required this.reservedProvider,
-    required this.paymentIntentId,
-    required this.workingHours,
-    required this.potentialProviders,
+    required this.name,
+    required this.email,
+    this.profileImage,
+    this.phoneNumber,
+    required this.favorites,
     required this.createdAt,
     required this.updatedAt,
-    required this.v,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) => User(
-    id: json["_id"],
-    authId: AuthId.fromJson(json["authId"]),
-    serviceCategories: List<dynamic>.from(
-      json["serviceCategories"].map((x) => x),
-    ),
-    isActive: json["isActive"],
-    isVerified: json["isVerified"],
-    attachments: List<dynamic>.from(json["attachments"].map((x) => x)),
-    rating: json["rating"],
-    totalReviews: json["totalReviews"],
-    pendingUpdates: json["pendingUpdates"],
-    reservedProvider: json["reservedProvider"],
-    paymentIntentId: json["paymentIntentId"],
-    workingHours: List<dynamic>.from(json["workingHours"].map((x) => x)),
-    potentialProviders: List<dynamic>.from(
-      json["potentialProviders"].map((x) => x),
-    ),
-    createdAt: DateTime.parse(json["createdAt"]),
-    updatedAt: DateTime.parse(json["updatedAt"]),
-    v: json["__v"],
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['_id'] ?? '',
+      authId: json['authId'] != null
+          ? AuthId.fromJson(json['authId'])
+          : AuthId.empty(),
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      profileImage: json['profile_image'],
+      phoneNumber: json['phoneNumber'],
+      favorites: json['favorites'] != null
+          ? Favorites.fromJson(json['favorites'])
+          : Favorites.empty(),
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ??
+          DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ??
+          DateTime.now(),
+    );
+  }
+
+  factory User.empty() => User(
+    id: '',
+    authId: AuthId.empty(),
+    name: '',
+    email: '',
+    profileImage: null,
+    phoneNumber: null,
+    favorites: Favorites.empty(),
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
   );
 }
 
@@ -93,37 +102,56 @@ class AuthId {
   final String id;
   final String name;
   final String email;
+  final String? phoneNumber;
   final String role;
-  final bool isBlocked;
   final bool isActive;
-  final bool isPhoneVerified;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final int v;
+  final bool isBlocked;
 
   AuthId({
     required this.id,
     required this.name,
     required this.email,
+    this.phoneNumber,
     required this.role,
-    required this.isBlocked,
     required this.isActive,
-    required this.isPhoneVerified,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.v,
+    required this.isBlocked,
   });
 
-  factory AuthId.fromJson(Map<String, dynamic> json) => AuthId(
-    id: json["_id"],
-    name: json["name"],
-    email: json["email"],
-    role: json["role"],
-    isBlocked: json["isBlocked"],
-    isActive: json["isActive"],
-    isPhoneVerified: json["isPhoneVerified"],
-    createdAt: DateTime.parse(json["createdAt"]),
-    updatedAt: DateTime.parse(json["updatedAt"]),
-    v: json["__v"],
+  factory AuthId.fromJson(Map<String, dynamic> json) {
+    return AuthId(
+      id: json['_id'] ?? '',
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      phoneNumber: json['phoneNumber'],
+      role: json['role'] ?? '',
+      isActive: json['isActive'] ?? false,
+      isBlocked: json['isBlocked'] ?? false,
+    );
+  }
+
+  factory AuthId.empty() => AuthId(
+    id: '',
+    name: '',
+    email: '',
+    phoneNumber: null,
+    role: '',
+    isActive: false,
+    isBlocked: false,
   );
+}
+
+class Favorites {
+  final List<String> categories;
+
+  Favorites({required this.categories});
+
+  factory Favorites.fromJson(Map<String, dynamic> json) {
+    return Favorites(
+      categories: (json['categories'] as List<dynamic>? ?? [])
+          .map((e) => e.toString())
+          .toList(),
+    );
+  }
+
+  factory Favorites.empty() => Favorites(categories: []);
 }

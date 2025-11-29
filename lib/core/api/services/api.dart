@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
+import 'package:doda_work/core/utils/message_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
@@ -81,10 +82,14 @@ class ApiRequest {
         final errorMessage = error['message'] ?? 'Something went wrong!';
         log('❌ Error: $errorMessage');
         CustomSnackBar.error(errorMessage);
+        CustomSnackBar.error(errorMessage);
         throw Exception(errorMessage);
+
       }
     } catch (e) {
-      log('🐞🐞🐞 UNHANDLED ERROR: ${e.toString()}');
+      
+      MessageHelper.showError("Please Check Email and Password!");
+      log('🐞🐞🐞 UNHANDLED ERROR:${e.toString()}');
       throw Exception(e.toString());
     } finally {
       isLoading.value = false;
@@ -509,4 +514,115 @@ class ApiRequest {
   //   }
   //   return true;
   // }
+
+
+  // static Future<R> multiMultipartRequest2<R>({
+  //   required String endPoint,
+  //   required RxBool isLoading,
+  //   required String reqType, // GET, POST, PATCH, PUT
+  //   required Map<String, dynamic> body,
+  //   required Map<String, File?> files,
+  //   Map<String, List<File>>? filesList,
+  //   String? singleQueryParam,
+  //   required R Function(Map<String, dynamic>) fromJson,
+  //   bool showSuccessSnackBar = false,
+  //   Function(R result)? onSuccess,
+  //   required String token, // ✅ Backend requires Bearer Token
+  // }) async {
+  //   try {
+  //     isLoading.value = true;
+  //
+  //     // 🔐 Add Token into header
+  //     final headers = {
+  //       "Accept": "application/json",
+  //       "Authorization": "Bearer ${AppStorage.token}", // <--- Required by backend
+  //     };
+  //
+  //     // Build URL
+  //     String fullUrl = '${ApiEndPoints.baseUrl}$endPoint';
+  //     if (singleQueryParam != null && singleQueryParam.isNotEmpty) {
+  //       if (!singleQueryParam.startsWith('/')) fullUrl += '/';
+  //       fullUrl += singleQueryParam;
+  //     }
+  //
+  //     final uri = Uri.parse(fullUrl);
+  //
+  //     final request = http.MultipartRequest(reqType.toUpperCase(), uri);
+  //     request.headers.addAll(headers);
+  //
+  //     // 📝 Add normal fields
+  //     body.forEach((key, value) {
+  //       if (value is List || value is Map) {
+  //         request.fields[key] = jsonEncode(value);
+  //       } else {
+  //         request.fields[key] = value?.toString() ?? '';
+  //       }
+  //     });
+  //
+  //     // 📁 Add single files
+  //     for (var entry in files.entries) {
+  //       final file = entry.value;
+  //       if (file == null) continue;
+  //
+  //       final mimeType = lookupMimeType(file.path) ?? 'application/octet-stream';
+  //
+  //       request.files.add(
+  //         await http.MultipartFile.fromPath(
+  //           entry.key,
+  //           file.path,
+  //           contentType: MediaType.parse(mimeType),
+  //         ),
+  //       );
+  //     }
+  //
+  //     // 📁📁 Add multi-files correctly
+  //     if (filesList != null && filesList.isNotEmpty) {
+  //       for (var entry in filesList.entries) {
+  //         final key = entry.key;
+  //         final fileList = entry.value;
+  //
+  //         for (var file in fileList) {
+  //           final mimeType =
+  //               lookupMimeType(file.path) ?? 'application/octet-stream';
+  //
+  //           request.files.add(
+  //             await http.MultipartFile.fromPath(
+  //               "$key[]", // array format (most backend uses this)
+  //               file.path,
+  //               contentType: MediaType.parse(mimeType),
+  //             ),
+  //           );
+  //         }
+  //       }
+  //     }
+  //
+  //     // Send request
+  //     final streamedResponse = await request.send();
+  //     final response = await http.Response.fromStream(streamedResponse);
+  //
+  //     if (response.statusCode == 200 || response.statusCode == 201) {
+  //       final json = jsonDecode(response.body);
+  //       final result = fromJson(json);
+  //
+  //       if (onSuccess != null) onSuccess(result);
+  //       if (showSuccessSnackBar) {
+  //         CustomSnackBar.success(
+  //           title: "Success",
+  //           message: json["message"] ?? "Request completed successfully",
+  //         );
+  //       }
+  //
+  //       return result;
+  //     } else {
+  //       final msg = jsonDecode(response.body)['message'] ?? "Something went wrong";
+  //       CustomSnackBar.error(msg);
+  //       throw Exception(msg);
+  //     }
+  //   } catch (e) {
+  //     throw Exception(e.toString());
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
+
 }

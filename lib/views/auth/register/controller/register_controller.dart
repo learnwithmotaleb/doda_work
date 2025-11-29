@@ -39,6 +39,7 @@ class RegisterController extends GetxController {
   //   }
   // }
 
+
   RxBool isLoading = false.obs;
 
   registerProcess() async {
@@ -50,6 +51,7 @@ class RegisterController extends GetxController {
       password: passwordController.text,
       role: AppStorage.isVendor == true ? "PROVIDER" : "USER",
       confirmPassword: passConfirmController.text,
+
     );
   }
 }

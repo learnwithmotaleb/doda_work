@@ -6,10 +6,8 @@ import 'package:doda_work/views/navigation/controller/navigation_controller.dart
 import '../controller/home_controller.dart';
 import 'home_screen_mobile.dart';
 
-part '../widget/category_widget.dart';
 part '../widget/home_app_bar_widget.dart';
 part '../widget/services_list_widget.dart';
-part '../widget/search_bar_widget.dart';
 part '../widget/custom_status_card_widget_widget.dart';
 
 

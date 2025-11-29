@@ -8,41 +8,54 @@ class FavoriteScreenMobile extends GetView<FavoriteController> {
     return Scaffold(
       appBar: CommonAppBar(title: 'Favorite'),
       body: SafeArea(
-        child: ListView(
-          padding: Dimensions.defaultHorizontalSize.edgeHorizontal,
-          children: [
-            ListTile(
-              trailing: Icon(Icons.favorite, color: CustomColors.primary),
-              contentPadding: EdgeInsetsGeometry.zero,
-              title: TextWidget(
-                'Category ',
-                fontWeight: FontWeight.w500,
-                color: CustomColors.primary,
-              ),
+        child: Obx(() {
+          // Loading
+          if (controller.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-              subtitle: TextWidget(
-                'Dlkfajsdlkdjsfladsfds',
-                fontSize: Dimensions.titleSmall,
+          // Empty state
+          if (controller.favoriteList.isEmpty) {
+            return RefreshIndicator(
+              onRefresh: () => controller.fetchFavoriteCategories(),
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: const [
+                  SizedBox(height: 250),
+                  Center(child: Text("No favorites found")),
+                ],
               ),
-            ),
-            DividerWidget(),
-            ListTile(
-              trailing: Icon(Icons.favorite, color: CustomColors.primary),
-              contentPadding: EdgeInsetsGeometry.zero,
-              title: TextWidget(
-                'SubCatgegory ',
-                fontWeight: FontWeight.w500,
-                color: CustomColors.primary,
-              ),
+            );
+          }
 
-              subtitle: TextWidget(
-                'Dlkfajsdlkdjsfladsfds',
-                fontSize: Dimensions.titleSmall,
-              ),
+          // ListView with RefreshIndicator
+          return RefreshIndicator(
+            onRefresh: () => controller.fetchFavoriteCategories(),
+            child: ListView.separated(
+              padding: Dimensions.defaultHorizontalSize.edgeHorizontal,
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount: controller.favoriteList.length,
+              separatorBuilder: (_, __) => DividerWidget(),
+              itemBuilder: (context, index) {
+                final item = controller.favoriteList[index];
+
+                return ListTile(
+                  trailing: Icon(Icons.favorite, color: CustomColors.primary),
+                  contentPadding: EdgeInsets.zero,
+                  title: TextWidget(
+                    item.name,
+                    fontWeight: FontWeight.w500,
+                    color: CustomColors.primary,
+                  ),
+                  subtitle: TextWidget(
+                    item.icon,  // you can show another field here
+                    fontSize: Dimensions.titleSmall,
+                  ),
+                );
+              },
             ),
-            DividerWidget(),
-          ],
-        ),
+          );
+        }),
       ),
     );
   }

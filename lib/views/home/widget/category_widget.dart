@@ -1,17 +1,25 @@
-part of '../screen/home_screen.dart';
+
+
+import 'package:get/get_state_manager/src/simple/get_view.dart';
+
+import '../../../core/utils/basic_import.dart';
+import '../../../core/utils/extensions.dart';
+import '../../../routes/routes.dart';
+import '../../category/controller/category_controller.dart';
+import '../controller/home_controller.dart';
 
 class CategoryWidgetView extends GetView<HomeController> {
   const CategoryWidgetView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
     final categoryController = Get.find<CategoryController>();
 
     return Padding(
       padding: Dimensions.defaultHorizontalSize.edgeHorizontal,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -62,51 +70,45 @@ class CategoryWidgetView extends GetView<HomeController> {
               );
             }
 
-            final int itemCount = categoryController.allCategory.length > 3 ? 3 : categoryController.allCategory.length;
-
             return SizedBox(
-              height: screenHeight * 0.15,
-              child: GridView.builder(
-                padding: EdgeInsets.zero,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  childAspectRatio: 0.9,
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
-                ),
-                itemCount: itemCount,
+              height: screenWidth * 0.25, // height for horizontal list
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: categoryController.allCategory.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
                   final category = categoryController.allCategory[index];
-                  return RepaintBoundary(
-                    child: GestureDetector(
-                      onTap: () => Get.toNamed(Routes.allCategoryScreen),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          ClipOval(
-                            child: CachedNetworkImage(
-                              imageUrl: category.icon != null ? ApiEndPoints.baseUrl+(category.icon ?? "") : "https://picsum.photos/200/300?random=${index + 1}",
-                              width: screenWidth * 0.16,
-                              height: screenWidth * 0.16,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) =>
-                                  Container(color: Colors.grey.shade300),
-                              errorWidget: (context, url, error) =>
-                                  Container(color: Colors.grey.shade300, child: const Icon(Icons.error, color: Colors.red)),
-                            ),
+                  return GestureDetector(
+                    onTap: () => Get.toNamed(Routes.allCategoryScreen),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: category.icon != null
+                                ? ApiEndPoints.baseUrl + (category.icon ?? "")
+                                : "https://picsum.photos/200/300?random=$index",
+                            width: screenWidth * 0.16,
+                            height: screenWidth * 0.16,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) =>
+                                Container(color: Colors.grey.shade300),
+                            errorWidget: (context, url, error) =>
+                                Container(color: Colors.grey.shade300, child: const Icon(Icons.error, color: Colors.red)),
                           ),
-                          const SizedBox(height: 5),
-                          TextWidget(
-                            textAlign: TextAlign.center,
-                            category.name ?? "Unnamed",
-                            maxLines: 2,
-                            fontSize: Dimensions.titleSmall * 0.8,
-                            textOverflow: TextOverflow.ellipsis,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 5),
+                        TextWidget(
+                          (category.name != null && category.name!.length > 5)
+                              ? '${category.name!.substring(0, 5)}...'
+                              : category.name ?? "Unnamed",
+                          fontSize: Dimensions.titleSmall * 0.8,
+                          fontWeight: FontWeight.w500,
+                          maxLines: 1,
+                          textOverflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
                   );
                 },

@@ -26,13 +26,14 @@ class Data {
   final AuthId authId;
   final String name;
   final String email;
-  final String phoneNumber;
+  final String? phoneNumber;
   final DateTime createdAt;
   final DateTime updatedAt;
   final int v;
-  final String address;
-  final String latitude;
-  final String longitude;
+  final String? address;
+  final String? latitude;
+  final String? longitude;
+  final String? profileImage;
 
   Data({
     required this.favorites,
@@ -40,28 +41,30 @@ class Data {
     required this.authId,
     required this.name,
     required this.email,
-    required this.phoneNumber,
+    this.phoneNumber,
     required this.createdAt,
     required this.updatedAt,
     required this.v,
-    required this.address,
-    required this.latitude,
-    required this.longitude,
+    this.address,
+    this.latitude,
+    this.longitude,
+    this.profileImage,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
     favorites: Favorites.fromJson(json["favorites"]),
     id: json["_id"],
     authId: AuthId.fromJson(json["authId"]),
-    name: json["name"],
-    email: json["email"],
-    phoneNumber: json["phoneNumber"],
+    name: json["name"] ?? '',
+    email: json["email"] ?? '',
+    phoneNumber: json["phoneNumber"], // nullable
     createdAt: DateTime.parse(json["createdAt"]),
     updatedAt: DateTime.parse(json["updatedAt"]),
-    v: json["__v"],
-    address: json["address"],
-    latitude: json["latitude"],
-    longitude: json["longitude"],
+    v: json["__v"] ?? 0,
+    address: json["address"], // nullable
+    latitude: json["latitude"], // nullable
+    longitude: json["longitude"], // nullable
+    profileImage: json["profile_image"], // nullable
   );
 }
 
@@ -92,15 +95,15 @@ class AuthId {
 
   factory AuthId.fromJson(Map<String, dynamic> json) => AuthId(
     id: json["_id"],
-    name: json["name"],
-    email: json["email"],
-    role: json["role"],
-    isBlocked: json["isBlocked"],
-    isActive: json["isActive"],
-    isPhoneVerified: json["isPhoneVerified"],
+    name: json["name"] ?? '',
+    email: json["email"] ?? '',
+    role: json["role"] ?? '',
+    isBlocked: json["isBlocked"] ?? false,
+    isActive: json["isActive"] ?? false,
+    isPhoneVerified: json["isPhoneVerified"] ?? false,
     createdAt: DateTime.parse(json["createdAt"]),
     updatedAt: DateTime.parse(json["updatedAt"]),
-    v: json["__v"],
+    v: json["__v"] ?? 0,
   );
 }
 
@@ -110,6 +113,6 @@ class Favorites {
   Favorites({required this.categories});
 
   factory Favorites.fromJson(Map<String, dynamic> json) => Favorites(
-    categories: List<dynamic>.from(json["categories"].map((x) => x)),
+    categories: List<dynamic>.from(json["categories"] ?? []),
   );
 }

@@ -72,6 +72,7 @@ class $AssetsIconsGen {
 
   /// File path: assets/icons/Green.svg
   String get green => 'assets/icons/Green.svg';
+  String get home => 'assets/icons/home.svg';
 
   /// File path: assets/icons/Group.svg
   String get group => 'assets/icons/Group.svg';
@@ -115,6 +116,7 @@ class $AssetsIconsGen {
   /// List of all assets
   List<String> get values => [
     frame1,
+    home,
     green,
     group,
     popup,

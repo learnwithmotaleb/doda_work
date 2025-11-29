@@ -36,23 +36,17 @@ class LoginController extends GetxController {
   void onInit() {
     super.onInit();
 
-    /// Default credentials for testing
+    /// Default test credentials
     emailController.text = 'qeo@yopmail.com';
     passwordController.text = '112233';
   }
 
-  @override
-  void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
-    emailFocus.dispose();
-    passwordFocus.dispose();
-    super.onClose();
-  }
+  /// ❌ REMOVE dispose()
+  /// GetX নিজেই lifecycle handle করবে
 
-  /// ===============================
-  /// 🔥 LOGIN USING EMAIL + PASSWORD
-  /// ===============================
+  /// =======================================
+  /// 🔥 LOGIN USING EMAIL + PASSWORD (API)
+  /// =======================================
   Future<dynamic> loginProcess() async {
     return await AuthService.loginService(
       isLoading: isLoading,
@@ -61,20 +55,26 @@ class LoginController extends GetxController {
     );
   }
 
-  /// ===============================
-  /// 🔥 GOOGLE SIGN IN
-  /// ===============================
+  /// =======================================
+  /// 🔥 GOOGLE SIGN IN (Android / iOS / Web)
+  /// =======================================
   Future<User?> signInWithGoogle(BuildContext context) async {
     try {
-      final googleSignIn = GoogleSignIn(
-        clientId: "621538781171-8f9t0fpop11e2cfg4jc5qc9iukbb1sq5.apps.googleusercontent.com",
-        serverClientId: "621538781171-aq5ivgocr6otgp90d5mbhmvicnrn1re1.apps.googleusercontent.com",
-        scopes: ['email', 'profile'],
-      );
+      GoogleSignIn googleSignIn;
+
+      if (kIsWeb) {
+        googleSignIn = GoogleSignIn(
+          clientId:
+          "621538781171-8f9t0fpop11e2cfg4jc5qc9iukbb1sq5.apps.googleusercontent.com",
+          scopes: ['email', 'profile'],
+        );
+      } else {
+        googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
+      }
 
       final googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
-        Get.snackbar("Cancelled", "Google sign-in was cancelled");
+        Get.snackbar("Cancelled", "Google sign-in cancelled");
         return null;
       }
 
@@ -85,7 +85,8 @@ class LoginController extends GetxController {
         idToken: googleAuth.idToken,
       );
 
-      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      final userCredential =
+      await FirebaseAuth.instance.signInWithCredential(credential);
 
       firebaseUser.value = userCredential.user;
 
@@ -95,21 +96,20 @@ class LoginController extends GetxController {
       );
 
       return userCredential.user;
-
     } catch (e) {
-      if (kDebugMode) print("Google Sign-In Error: $e");
+      debugPrint("Google Sign-In Error: $e");
 
       await FirebaseAuth.instance.signOut();
       firebaseUser.value = null;
 
-      Get.snackbar("Error", "Google Sign-In failed");
+      Get.snackbar("Error", "Google Sign-In failed: $e");
       return null;
     }
   }
 
-  /// ===============================
+  /// =======================================
   /// 🔥 SIGN OUT (Google + Firebase)
-  /// ===============================
+  /// =======================================
   Future<void> signOut() async {
     try {
       await GoogleSignIn().signOut();
@@ -119,26 +119,26 @@ class LoginController extends GetxController {
 
       Get.snackbar("Success", "Signed out successfully");
     } catch (e) {
-      print("Sign-Out Error: $e");
-      Get.snackbar("Error", "Sign-out failed");
+      debugPrint("Sign-Out Error: $e");
+      Get.snackbar("Error", "Unable to sign out");
     }
   }
 
   /// APPLE AUTH INSTANCE
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  /// ===============================
-  /// 🔥 APPLE SIGN IN
-  /// ===============================
+  /// =======================================
+  /// 🔥 APPLE SIGN IN (iOS / macOS Only)
+  /// =======================================
   static Future<UserCredential?> signInWithApple() async {
     try {
       if (kIsWeb) {
-        print("Apple Sign-In not supported on Web.");
+        print("❌ Apple Sign-In not supported on Web");
         return null;
       }
 
       if (!Platform.isIOS && !Platform.isMacOS) {
-        print("Apple Sign-In only for iOS/macOS.");
+        print("❌ Apple Sign-In only supports iOS/macOS");
         return null;
       }
 
@@ -155,22 +155,25 @@ class LoginController extends GetxController {
       );
 
       return await _auth.signInWithCredential(oauthCredential);
-
     } catch (e) {
-      print("Apple Sign-In Error: $e");
+      debugPrint("Apple Sign-In Error: $e");
       return null;
     }
   }
 
-  /// ===============================
-  /// 🔥 CURRENT USER (APPLE/GMAIL)
-  /// ===============================
+  /// =======================================
+  /// 🔥 CURRENT USER
+  /// =======================================
   static User? currentUser() => _auth.currentUser;
 
-  /// ===============================
-  /// 🔥 SIGN OUT APPLE
-  /// ===============================
+  /// =======================================
+  /// 🔥 SIGN OUT (Apple + Firebase)
+  /// =======================================
   static Future<void> signOutApple() async {
-    await _auth.signOut();
+    try {
+      await _auth.signOut();
+    } catch (e) {
+      debugPrint("Apple Sign-Out Error: $e");
+    }
   }
 }
